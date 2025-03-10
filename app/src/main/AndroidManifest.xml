@@ -12,17 +12,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExpenseTrackerApp"
         tools:targetApi="31">
+
+        <!-- ✅ Correct: MainActivity is the Launcher Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.ExpenseTrackerApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- ❌ Removed LAUNCHER intent-filter from LoginActivity -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:label="Login"
+            android:theme="@style/Theme.ExpenseTrackerApp">
+        </activity>
+
     </application>
 
 </manifest>

@@ -1,21 +1,16 @@
 package com.example.expensetrackerapp
 
-import androidx.compose.runtime.*
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.expensetrackerapp.ui.theme.ExpenseTrackerAppTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.expensetrackerapp.ui.theme.ExpenseTrackerAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,8 +20,12 @@ class MainActivity : ComponentActivity() {
             ExpenseTrackerAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                        name = "User",
+                        modifier = Modifier.padding(innerPadding),
+                        navigateToLogin = {
+                            val intent = Intent(this, LoginActivity::class.java)
+                            startActivity(intent)  // ✅ Switch to LoginActivity
+                        }
                     )
                 }
             }
@@ -35,27 +34,16 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    var message by remember { mutableStateOf("Welcome to Expense Tracker, $name!") }
-
+fun Greeting(name: String, modifier: Modifier = Modifier, navigateToLogin: () -> Unit) {
     Column(
         modifier = modifier.padding(16.dp)
     ) {
-        Text(text = message)
+        Text(text = "Welcome to Expense Tracker, $name!")
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            message = "Enjoy tracking your expenses, $name!"
-        }) {
-            Text("Click Me")
+
+        // ✅ Navigate to LoginActivity
+        Button(onClick = navigateToLogin) {
+            Text("Go to Login")
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ExpenseTrackerAppTheme {
-        Greeting("Android")
     }
 }
