@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">ExpenseTrackerApp</string>
+    <string name="app_name">ExpenseTracker App</string>
+    <string name="signup_button">Sign Up</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="already_have_account">Already have an account? Login</string>
+    <string name="login_text">Login</string>
+
 </resources>
