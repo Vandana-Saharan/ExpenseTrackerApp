@@ -42,6 +42,8 @@
         <!-- ✅ Dashboard Activity -->
         <activity android:name=".DashboardActivity" />
         <activity android:name=".AddExpenseActivity" />
+        <activity android:name=".ViewExpensesActivity" />
+
 
     </application>
 </manifest>

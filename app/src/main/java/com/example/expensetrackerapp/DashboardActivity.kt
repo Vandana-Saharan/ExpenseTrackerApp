@@ -52,6 +52,8 @@ fun DashboardScreen(
     onLogout: () -> Unit,
     onAddExpense: () -> Unit
 ) {
+    val context = LocalContext.current  // ✅ Get the current context
+
     Column(
         modifier = modifier.padding(16.dp)
     ) {
@@ -69,5 +71,19 @@ fun DashboardScreen(
         Button(onClick = onLogout) {
             Text("Logout")
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // ✅ View Expenses Button (Fixed)
+        Button(
+            onClick = {
+                val intent = Intent(context, ViewExpensesActivity::class.java)
+                context.startActivity(intent)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("View Expenses")
+        }
     }
 }
+
