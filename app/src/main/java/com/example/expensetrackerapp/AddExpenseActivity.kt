@@ -2,43 +2,85 @@ package com.example.expensetrackerapp
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import com.example.expensetrackerapp.ui.theme.ExpenseTrackerAppTheme
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AddExpenseActivity : ComponentActivity() {
+class AddExpenseActivity : AppCompatActivity() {
 
-    private val db = FirebaseFirestore.getInstance()  // Firebase Firestore instance
+    private val db = FirebaseFirestore.getInstance()
+    private lateinit var expenseNameEditText: EditText
+    private lateinit var expenseAmountEditText: EditText
+    private lateinit var selectDateButton: Button
+    private lateinit var expenseCategoryButton: Button
+    private lateinit var addExpenseButton: Button
+
+    private var selectedDate: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    private var selectedCategory: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        setContentView(R.layout.activity_add_expense)
 
-        setContent {
-            ExpenseTrackerAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AddExpenseScreen(modifier = Modifier.padding(innerPadding)) { expenseName, amount, category, date ->
-                        saveExpenseToFirestore(expenseName, amount, category, date)
-                    }
-                }
+        // Bind UI components
+        expenseNameEditText = findViewById(R.id.expenseName)
+        expenseAmountEditText = findViewById(R.id.expenseAmount)
+        selectDateButton = findViewById(R.id.selectDateButton)
+        expenseCategoryButton = findViewById(R.id.expenseCategory)
+        addExpenseButton = findViewById(R.id.addExpenseButton)
+
+        selectDateButton.text = "Select Date: $selectedDate"
+
+        // Date picker
+        selectDateButton.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    calendar.set(year, month, dayOfMonth)
+                    selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+                    selectDateButton.text = "Date: $selectedDate"
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+
+        // Category selection (Simple pop-up)
+        expenseCategoryButton.setOnClickListener {
+            val categories = arrayOf("Food", "Grocery", "Shopping", "Rent", "Entertainment", "Laundry", "Others")
+            val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+            builder.setTitle("Select Category")
+            builder.setItems(categories) { _, which ->
+                selectedCategory = categories[which]
+                expenseCategoryButton.text = selectedCategory
+            }
+            builder.show()
+        }
+
+        // Save expense button
+        addExpenseButton.setOnClickListener {
+            val expenseName = expenseNameEditText.text.toString().trim()
+            val amount = expenseAmountEditText.text.toString().trim()
+
+            if (expenseName.isEmpty() || amount.isEmpty() || selectedCategory.isEmpty() || selectedDate.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+            } else {
+                saveExpenseToFirestore(expenseName, amount, selectedCategory, selectedDate)
             }
         }
     }
 
     private fun saveExpenseToFirestore(expenseName: String, amount: String, category: String, date: String) {
-        if (expenseName.isEmpty() || amount.isEmpty() || category.isEmpty() || date.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            Toast.makeText(this, "Please log in to add expenses", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -46,122 +88,21 @@ class AddExpenseActivity : ComponentActivity() {
             "name" to expenseName,
             "amount" to amount,
             "category" to category,
-            "date" to date,  // Storing selected date
-            "timestamp" to System.currentTimeMillis()  // Storing current timestamp
+            "date" to date,
+            "timestamp" to System.currentTimeMillis(),
+            "userId" to currentUser.uid
         )
 
-        db.collection("expenses")
+        db.collection("users")
+            .document(currentUser.uid)
+            .collection("expenses")
             .add(expense)
             .addOnSuccessListener {
                 Toast.makeText(this, "Expense added successfully!", Toast.LENGTH_SHORT).show()
-                finish()  // Close AddExpenseActivity
+                finish()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to add expense!", Toast.LENGTH_SHORT).show()
             }
-    }
-}
-
-@Composable
-fun AddExpenseScreen(modifier: Modifier = Modifier, onSaveExpense: (String, String, String, String) -> Unit) {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance()
-
-    var expenseName by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf("Select Category") }
-
-    // Format date to "yyyy-MM-dd"
-    val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    var selectedDate by remember { mutableStateOf(dateFormatter.format(calendar.time)) }  // Default to today’s date
-
-    val categories = listOf("Food", "Grocery", "Shopping", "Rent", "Entertainment", "Laundry", "Others")
-
-    Column(
-        modifier = modifier.padding(16.dp)
-    ) {
-        Text(text = "Add Expense", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Expense Name Input Field
-        OutlinedTextField(
-            value = expenseName,
-            onValueChange = { expenseName = it },
-            label = { Text("Expense Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Amount Input Field
-        OutlinedTextField(
-            value = amount,
-            onValueChange = { amount = it },
-            label = { Text("Amount") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Date Picker Button
-        OutlinedButton(
-            onClick = {
-                DatePickerDialog(
-                    context,
-                    { _, year, month, dayOfMonth ->
-                        calendar.set(year, month, dayOfMonth)
-                        selectedDate = dateFormatter.format(calendar.time)  // Update selected date
-                    },
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH)
-                ).show()
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Date: $selectedDate")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Dropdown Menu for Category Selection
-        Box {
-            OutlinedButton(
-                onClick = { expanded = true },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(selectedCategory)
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                categories.forEach { category ->
-                    DropdownMenuItem(
-                        text = { Text(category) },
-                        onClick = {
-                            selectedCategory = category  // Update selected category
-                            expanded = false  // Close dropdown
-                        }
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Save Button
-        Button(
-            onClick = {
-                if (expenseName.isNotEmpty() && amount.isNotEmpty() && selectedCategory != "Select Category") {
-                    onSaveExpense(expenseName, amount, selectedCategory, selectedDate)  // Pass all values to Firebase
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Save Expense")
-        }
     }
 }

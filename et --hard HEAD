@@ -1,0 +1,35 @@
+[33mcommit c586859798cf967b6ff152c36242754fcc4b8320[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Vandana-Saharan <vandanasaharan11@gmail.com>
+Date:   Fri Mar 14 21:07:58 2025 +0530
+
+    expense view feature updated
+
+[33mcommit 122808599115869587be75bd3dd1f54038f1d672[m
+Author: Vandana-Saharan <vandanasaharan11@gmail.com>
+Date:   Fri Mar 14 10:33:04 2025 +0530
+
+    Updated ViewExpensesActivity with RecyclerView and Firestore data binding
+
+[33mcommit f7aea079e4cbf744eab34cd553c0cbff7b53a643[m
+Author: Vandana-Saharan <vandanasaharan11@gmail.com>
+Date:   Thu Mar 13 19:49:52 2025 +0530
+
+     added expense storage functionality
+
+[33mcommit 81c4733b6a80863cdaa900fc606e1bd2a6e2e0fc[m
+Author: Vandana-Saharan <vandanasaharan11@gmail.com>
+Date:   Wed Mar 12 14:47:35 2025 +0530
+
+    creted signup functionality and navigation updation
+
+[33mcommit 0ac0e53e71c6e43d62cced01d086eaf3c5ded50b[m
+Author: Vandana-Saharan <vandanasaharan11@gmail.com>
+Date:   Mon Mar 10 19:30:05 2025 +0530
+
+    added login module and navigation
+
+[33mcommit 94763130c5b8e3da8981b185fa63e1b99cdeb832[m
+Author: Vandana-Saharan <vandanasaharan11@gmail.com>
+Date:   Fri Mar 7 17:51:51 2025 +0530
+
+    initial setup project

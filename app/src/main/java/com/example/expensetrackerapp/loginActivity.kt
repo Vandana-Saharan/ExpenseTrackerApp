@@ -20,8 +20,8 @@ class LoginActivity : AppCompatActivity() {
 
         // ✅ Auto-Login Check: If the user is already signed in, go to Dashboard
         if (auth.currentUser != null) {
-            startActivity(Intent(this, DashboardActivity::class.java))
-            finish()
+            startActivity(Intent(this, MainActivity::class.java))
+            finishAffinity()
             return
         }
 
@@ -63,10 +63,10 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, DashboardActivity::class.java))
-                    finish()
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finishAffinity()  // ✅ Clears back stack
                 } else {
-                    // ✅ Improved Error Handling
                     val errorMessage = task.exception?.message ?: "Login Failed"
                     Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
                 }

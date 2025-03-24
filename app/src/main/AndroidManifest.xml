@@ -12,9 +12,9 @@
         android:theme="@style/Theme.ExpenseTrackerApp"
         tools:targetApi="31">
 
-        <!-- ✅ MainActivity is the Launcher Activity -->
+        <!-- ✅ WelcomeActivity is now the Launcher Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".WelcomeActivity"
             android:exported="true"
             android:theme="@style/Theme.ExpenseTrackerApp">
             <intent-filter>
@@ -23,27 +23,32 @@
             </intent-filter>
         </activity>
 
+        <!-- ✅ MainActivity (launched after Welcome) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ExpenseTrackerApp" />
+
         <!-- ✅ LoginActivity -->
         <activity
             android:name="com.example.expensetrackerapp.LoginActivity"
             android:exported="true"
             android:label="Login"
-            android:theme="@style/Theme.ExpenseTrackerApp">
-        </activity>
+            android:theme="@style/Theme.ExpenseTrackerApp" />
 
-        <!-- ✅ Add SignupActivity -->
+        <!-- ✅ SignupActivity -->
         <activity
             android:name="com.example.expensetrackerapp.SignupActivity"
             android:exported="true"
             android:label="Sign Up"
-            android:theme="@style/Theme.ExpenseTrackerApp">
-        </activity>
+            android:theme="@style/Theme.ExpenseTrackerApp" />
 
-        <!-- ✅ Dashboard Activity -->
-        <activity android:name=".DashboardActivity" />
+        <!-- ✅ AddExpenseActivity -->
         <activity android:name=".AddExpenseActivity" />
+
+        <activity android:name="com.example.expensetrackerapp.DashboardActivity" />
+        <!-- ✅ ViewExpensesActivity -->
         <activity android:name=".ViewExpensesActivity" />
-
-
+        <activity android:name=".UserProfileActivity" />
     </application>
 </manifest>

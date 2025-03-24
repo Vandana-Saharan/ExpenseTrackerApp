@@ -1,11 +1,14 @@
 package com.example.expensetrackerapp
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.expensetrackerapp.model.Expense
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class ViewExpensesActivity : AppCompatActivity() {
 
@@ -15,9 +18,9 @@ class ViewExpensesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_view_expenses) // Make sure this is correct!
+        setContentView(R.layout.activity_view_expenses)
 
-        recyclerView = findViewById(R.id.recyclerViewExpenses) // Find RecyclerView
+        recyclerView = findViewById(R.id.recyclerViewExpenses)
         recyclerView.layoutManager = LinearLayoutManager(this)
         expenseAdapter = ExpenseAdapter(expensesList)
         recyclerView.adapter = expenseAdapter
@@ -26,7 +29,17 @@ class ViewExpensesActivity : AppCompatActivity() {
     }
 
     private fun fetchExpenses() {
-        FirebaseFirestore.getInstance().collection("expenses")
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            Toast.makeText(this, "Please log in to view your expenses", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(currentUser.uid)
+            .collection("expenses")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 val expenses = result.documents.mapNotNull { it.toObject(Expense::class.java) }
@@ -34,8 +47,8 @@ class ViewExpensesActivity : AppCompatActivity() {
                 expensesList.addAll(expenses)
                 expenseAdapter.notifyDataSetChanged()
             }
-            .addOnFailureListener {
-                // Handle error
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error fetching expenses: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 }
