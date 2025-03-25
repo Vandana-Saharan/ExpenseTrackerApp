@@ -18,29 +18,24 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        // ✅ Auto-Login Check: If the user is already signed in, go to Dashboard
+        // ✅ Auto-login check
         if (auth.currentUser != null) {
-            startActivity(Intent(this, DashboardActivity::class.java))
-            finish()
+            startDashboardActivity()
             return
         }
 
-        // ✅ Set the correct layout before accessing UI elements
         setContentView(R.layout.activity_login)
 
-        // ✅ Initialize UI elements AFTER setContentView
         val emailEditText: EditText = findViewById(R.id.editTextEmail)
         val passwordEditText: EditText = findViewById(R.id.editTextPassword)
         val loginButton: Button = findViewById(R.id.buttonLogin)
         val signupTextView: TextView = findViewById(R.id.textViewSignup)
 
-        // ✅ Correct Signup Navigation
         signupTextView.setOnClickListener {
             val intent = Intent(this, SignupActivity::class.java)
             startActivity(intent)
         }
 
-        // ✅ Login Button Click Listener
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
@@ -63,13 +58,17 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, DashboardActivity::class.java))
-                    finish()
+                    startDashboardActivity()
                 } else {
-                    // ✅ Improved Error Handling
                     val errorMessage = task.exception?.message ?: "Login Failed"
                     Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
                 }
             }
+    }
+
+    private fun startDashboardActivity() {
+        val intent = Intent(this, DashboardActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 }

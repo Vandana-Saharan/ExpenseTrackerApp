@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -14,7 +15,7 @@ class SignupActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_signup) // Connects to the XML file
+        setContentView(R.layout.activity_signup)
 
         auth = FirebaseAuth.getInstance()
 
@@ -22,6 +23,7 @@ class SignupActivity : AppCompatActivity() {
         val passwordEditText: EditText = findViewById(R.id.editTextPassword)
         val confirmPasswordEditText: EditText = findViewById(R.id.editTextConfirmPassword)
         val signupButton: Button = findViewById(R.id.buttonSignup)
+        val loginTextView: TextView = findViewById(R.id.textViewLogin)   // Add this ID in XML if not present
 
         signupButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
@@ -47,6 +49,13 @@ class SignupActivity : AppCompatActivity() {
 
             registerUser(email, password)
         }
+
+        // ✅ Add Login navigation
+        loginTextView.setOnClickListener {
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
     }
 
     private fun registerUser(email: String, password: String) {
@@ -54,11 +63,16 @@ class SignupActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Signup Successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, LoginActivity::class.java))  // Redirect to Login
-                    finish()
+                    startDashboardActivity()
                 } else {
                     Toast.makeText(this, "Signup Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
             }
+    }
+
+    private fun startDashboardActivity() {
+        val intent = Intent(this, DashboardActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 }

@@ -2,88 +2,76 @@ package com.example.expensetrackerapp
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import com.example.expensetrackerapp.ui.theme.ExpenseTrackerAppTheme
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 
-class DashboardActivity : ComponentActivity() {
+class DashboardActivity : AppCompatActivity() {
 
-    private lateinit var auth: FirebaseAuth  // Firebase Authentication instance
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
+        setContentView(R.layout.activity_dashboard)
         auth = FirebaseAuth.getInstance()
 
-        setContent {
-            ExpenseTrackerAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    DashboardScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        onLogout = {
-                            auth.signOut() // Log out the user
-                            val intent = Intent(this, LoginActivity::class.java)
-                            startActivity(intent)
-                            finish() // Close DashboardActivity
-                        },
-                        onAddExpense = {
-                            val intent = Intent(this, AddExpenseActivity::class.java)
-                            startActivity(intent) // Open AddExpenseActivity
-                        }
-                    )
-                }
+        val welcomeTextView = findViewById<TextView>(R.id.dashboardWelcomeText)
+        val buttonAddExpense = findViewById<Button>(R.id.buttonAddExpense)
+        val buttonViewExpenses = findViewById<Button>(R.id.buttonViewExpenses)
+        val buttonUserProfile = findViewById<Button>(R.id.buttonUserProfile)
+        //val buttonLogout = findViewById<Button>(R.id.buttonLogout) // Add this button in your XML if not already
+
+        buttonAddExpense.setOnClickListener {
+            checkLoginAndProceed {
+                startActivity(Intent(this, AddExpenseActivity::class.java))
             }
         }
+
+        buttonViewExpenses.setOnClickListener {
+            checkLoginAndProceed {
+                startActivity(Intent(this, ViewExpensesActivity::class.java))
+            }
+        }
+
+        buttonUserProfile.setOnClickListener {
+            startActivity(Intent(this, UserProfileActivity::class.java))
+        }
+
+       // buttonLogout.setOnClickListener {
+          //  logoutUser()
+       // }
     }
-}
 
-@Composable
-fun DashboardScreen(
-    modifier: Modifier = Modifier,
-    onLogout: () -> Unit,
-    onAddExpense: () -> Unit
-) {
-    val context = LocalContext.current  // ✅ Get the current context
-
-    Column(
-        modifier = modifier.padding(16.dp)
-    ) {
-        Text(text = "Welcome to Expense Tracker Dashboard!")
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ✅ Add Expense Button
-        Button(onClick = onAddExpense) {
-            Text("Add Expense")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ✅ Logout Button
-        Button(onClick = onLogout) {
-            Text("Logout")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ✅ View Expenses Button (Fixed)
-        Button(
-            onClick = {
-                val intent = Intent(context, ViewExpensesActivity::class.java)
-                context.startActivity(intent)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("View Expenses")
+    private fun checkLoginAndProceed(action: () -> Unit) {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            showLoginRequiredDialog()
+        } else {
+            action()
         }
     }
-}
 
+    private fun showLoginRequiredDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Login Required")
+            .setMessage("Please login or sign up to perform this action.")
+            .setPositiveButton("Login / Signup") { _, _ ->
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun logoutUser() {
+        auth.signOut()
+        Toast.makeText(this, "Logged out successfully!", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, WelcomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+    }
+}

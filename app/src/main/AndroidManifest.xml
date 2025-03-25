@@ -12,9 +12,9 @@
         android:theme="@style/Theme.ExpenseTrackerApp"
         tools:targetApi="31">
 
-        <!-- ✅ MainActivity is the Launcher Activity -->
+        <!-- ✅ Launcher Activity: Welcome Screen -->
         <activity
-            android:name=".MainActivity"
+            android:name=".WelcomeActivity"
             android:exported="true"
             android:theme="@style/Theme.ExpenseTrackerApp">
             <intent-filter>
@@ -23,27 +23,44 @@
             </intent-filter>
         </activity>
 
-        <!-- ✅ LoginActivity -->
+        <!-- ✅ Dashboard Activity (Main Hub after login/signup) -->
+        <activity
+            android:name="com.example.expensetrackerapp.DashboardActivity"
+            android:exported="true"
+            android:label="Dashboard" />
+
+        <!-- ✅ Login Activity -->
         <activity
             android:name="com.example.expensetrackerapp.LoginActivity"
             android:exported="true"
-            android:label="Login"
-            android:theme="@style/Theme.ExpenseTrackerApp">
-        </activity>
+            android:label="Login" />
 
-        <!-- ✅ Add SignupActivity -->
+        <!-- ✅ Signup Activity -->
         <activity
             android:name="com.example.expensetrackerapp.SignupActivity"
             android:exported="true"
-            android:label="Sign Up"
-            android:theme="@style/Theme.ExpenseTrackerApp">
-        </activity>
+            android:label="Sign Up" />
 
-        <!-- ✅ Dashboard Activity -->
-        <activity android:name=".DashboardActivity" />
-        <activity android:name=".AddExpenseActivity" />
-        <activity android:name=".ViewExpensesActivity" />
+        <!-- ✅ Add Expense Activity -->
+        <activity
+            android:name="com.example.expensetrackerapp.AddExpenseActivity"
+            android:exported="true"
+            android:label="Add Expense" />
 
+        <!-- ✅ View Expenses Activity -->
+        <activity
+            android:name="com.example.expensetrackerapp.ViewExpensesActivity"
+            android:exported="true"
+            android:label="View Expenses" />
+
+        <!-- ✅ User Profile Activity -->
+        <activity
+            android:name="com.example.expensetrackerapp.UserProfileActivity"
+            android:exported="true"
+            android:label="Profile" />
+
+        <!-- 🚫 Optional clean-up: Remove MainActivity if unused -->
+        <!-- <activity android:name=".MainActivity" android:exported="true" /> -->
 
     </application>
 </manifest>

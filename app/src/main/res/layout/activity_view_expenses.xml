@@ -2,95 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp">
 
-    <!-- Title -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Your Expenses"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:paddingBottom="10dp"/>
+        android:textColor="@color/primary_dark"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="center_horizontal" />
 
-    <!-- Sorting Layout -->
-    <LinearLayout
-        android:id="@+id/sortButtonsLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="8dp"
-        android:layout_marginBottom="10dp">
-
-        <!-- Sort by Date -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingEnd="8dp">
-            <Button
-                android:id="@+id/btnSortByDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sort by Date"
-                android:padding="8dp"
-                android:minHeight="48dp"/>
-            <Spinner
-                android:id="@+id/spinnerSortDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"/>
-        </LinearLayout>
-
-        <!-- Sort by Amount -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingEnd="8dp">
-            <Button
-                android:id="@+id/btnSortByAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sort by Amount"
-                android:padding="8dp"
-                android:minHeight="48dp"/>
-            <Spinner
-                android:id="@+id/spinnerSortAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"/>
-        </LinearLayout>
-
-        <!-- Sort by Category -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/btnSortByCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sort by Category"
-                android:padding="8dp"
-                android:minHeight="48dp"/>
-            <Spinner
-                android:id="@+id/spinnerSortCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Expenses List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewExpenses"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:paddingTop="8dp"
-        android:contentDescription="List of expenses" />
+        android:clipToPadding="false" />
 
 </LinearLayout>
