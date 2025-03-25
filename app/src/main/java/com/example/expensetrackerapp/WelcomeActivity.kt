@@ -4,52 +4,37 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.expensetrackerapp.ui.theme.ExpenseTrackerAppTheme
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 
-class WelcomeActivity : ComponentActivity() {
+class WelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_welcome)
 
-        setContent {
-            ExpenseTrackerAppTheme {
-                WelcomeScreen {
-                    // Navigate to MainActivity after delay or button click
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
-                }
-            }
-        }
-    }
-}
+        val buttonContinue = findViewById<Button>(R.id.buttonContinue)
 
-@Composable
-fun WelcomeScreen(onContinue: () -> Unit) {
-    LaunchedEffect(key1 = true) {
         // Automatically navigate after 2.5 seconds
         Handler(Looper.getMainLooper()).postDelayed({
-            onContinue()
+            navigateNext()
         }, 2500)
+
+        // Navigate on button click
+        buttonContinue.setOnClickListener {
+            navigateNext()
+        }
     }
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Welcome to Expense Tracker!", fontSize = 28.sp)
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(onClick = onContinue) {
-                Text("Continue")
-            }
+    private fun navigateNext() {
+        val auth = FirebaseAuth.getInstance()
+        val nextActivity = if (auth.currentUser != null) {
+            DashboardActivity::class.java
+        } else {
+            LoginActivity::class.java
         }
+        val intent = Intent(this, nextActivity)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 }

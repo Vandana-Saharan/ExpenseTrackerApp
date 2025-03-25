@@ -33,7 +33,6 @@ class UserProfileActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        // Link XML views
         imageViewProfile = findViewById(R.id.imageViewProfile)
         textViewName = findViewById(R.id.textViewName)
         textViewEmail = findViewById(R.id.textViewEmail)
@@ -45,12 +44,12 @@ class UserProfileActivity : AppCompatActivity() {
 
         if (user == null) {
             Toast.makeText(this, "You are not logged in.", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+            val intent = Intent(this, WelcomeActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
             return
         }
 
-        // Load profile picture if available
         user.photoUrl?.let {
             Glide.with(this).load(it).into(imageViewProfile)
         }
@@ -64,7 +63,6 @@ class UserProfileActivity : AppCompatActivity() {
         } ?: "--"
         textViewAccountCreated.text = "Account Created: $creationDate"
 
-        // Fetch and display total expenses
         CoroutineScope(Dispatchers.Main).launch {
             val totalExpense = fetchTotalExpensesForUser(user.uid)
             textViewTotalExpense.text = "Total Spent: ₹$totalExpense"
@@ -73,8 +71,9 @@ class UserProfileActivity : AppCompatActivity() {
         buttonLogout.setOnClickListener {
             auth.signOut()
             Toast.makeText(this, "Logged out successfully!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, WelcomeActivity::class.java))
-            finish()
+            val intent = Intent(this, WelcomeActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
         }
     }
 
