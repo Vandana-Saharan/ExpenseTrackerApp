@@ -90,7 +90,7 @@ class AddExpenseActivity : AppCompatActivity() {
             "category" to category,
             "date" to date,
             "timestamp" to System.currentTimeMillis(),
-            "userId" to currentUser.uid
+            "userId" to FirebaseAuth.getInstance().currentUser?.uid
         )
 
         db.collection("users")

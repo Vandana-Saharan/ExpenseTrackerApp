@@ -6,5 +6,6 @@ data class Expense(
     val amount: String = "",
     val category: String = "",
     val timestamp: Long = 0L,
-    val date: String = ""
+    val date: String = "",
+    var id: String = ""  // Firestore document ID
 )

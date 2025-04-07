@@ -60,7 +60,10 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
                     startDashboardActivity()
                 } else {
-                    val errorMessage = task.exception?.message ?: "Login Failed"
+                    var errorMessage = task.exception?.message ?: "Login Failed"
+                    if(errorMessage.contains("incorrect")){
+                        errorMessage = "Invalid Email or Password, Please try again!"
+                    }
                     Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
                 }
             }
