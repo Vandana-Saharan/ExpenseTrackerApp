@@ -65,14 +65,15 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth-ktx")
-    implementation ("androidx.appcompat:appcompat:1.6.1")
-    implementation ("com.google.android.material:material:1.11.0")
-    implementation ("com.google.firebase:firebase-firestore-ktx:24.10.0")
-    implementation ("com.google.firebase:firebase-auth-ktx")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation("io.coil-kt:coil-compose:2.4.0")
-    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation ("com.google.firebase:firebase-firestore-ktx:24.10.0")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
 
     // Glide for image loading
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+}
