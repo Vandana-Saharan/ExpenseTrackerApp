@@ -22,6 +22,43 @@
             android:layout_marginBottom="30dp"
             android:layout_marginTop="40dp" />
 
+
+        <Spinner
+            android:id="@+id/filterSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_margin="16dp"
+            android:entries="@array/filter_options"
+            android:padding="8dp" />
+
+        <TextView
+            android:id="@+id/tvExpenseSummary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Expense Summary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="16dp" />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_margin="16dp" />
+        <TextView
+            android:id="@+id/tvTotalExpense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total: ₹0.00"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/primary_dark"/>
+
+
+
         <Button
             android:id="@+id/buttonAddExpense"
             android:layout_width="match_parent"

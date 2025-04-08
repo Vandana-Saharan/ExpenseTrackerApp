@@ -12,4 +12,25 @@
     <color name="primary_dark_rgb">#183B4E</color>
     <color name="primary_rgb">#27548A</color>
     <color name="accent_rgb">#DDA853</color>
+    <!-- Pie Chart Category Colors -->
+<!--    <color name="colorFood">#FFA726</color>         &lt;!&ndash; Orange &ndash;&gt;-->
+<!--    <color name="colorGrocery">#66BB6A</color>      &lt;!&ndash; Green &ndash;&gt;-->
+<!--    <color name="colorShopping">#42A5F5</color>     &lt;!&ndash; Blue &ndash;&gt;-->
+<!--    <color name="colorRent">#AB47BC</color>         &lt;!&ndash; Purple &ndash;&gt;-->
+<!--    <color name="colorEntertainment">#EF5350</color>&lt;!&ndash; Red &ndash;&gt;-->
+<!--    <color name="colorLaundry">#FF7043</color>      &lt;!&ndash; Deep Orange &ndash;&gt;-->
+<!--    <color name="colorBills">#26A69A</color>        &lt;!&ndash; Teal &ndash;&gt;-->
+<!--    <color name="colorOthers">#BDBDBD</color>-->
+
+    <color name="pie_color_food">#4CAF50</color>
+    <color name="pie_color_grocery">#2196F3</color>
+    <color name="pie_color_shopping">#FF9800</color>
+    <color name="pie_color_rent">#F44336</color>
+    <color name="pie_color_entertainment">#9C27B0</color>
+    <color name="pie_color_laundry">#00BCD4</color>
+    <color name="pie_color_bills">#795548</color>
+    <color name="pie_color_others">#607D8B</color>
+    <color name="black">#000000</color>
+
 </resources>
+

@@ -70,6 +70,9 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore-ktx:24.10.0")
     implementation ("com.google.firebase:firebase-auth-ktx")
     implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation ("com.google.firebase:firebase-firestore-ktx:24.10.0")
+
     // Glide for image loading
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")

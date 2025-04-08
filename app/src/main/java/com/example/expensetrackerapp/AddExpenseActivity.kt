@@ -54,7 +54,7 @@ class AddExpenseActivity : AppCompatActivity() {
 
         // Category selection (Simple pop-up)
         expenseCategoryButton.setOnClickListener {
-            val categories = arrayOf("Food", "Grocery", "Shopping", "Rent", "Entertainment", "Laundry", "Others")
+            val categories = arrayOf("Food", "Grocery", "Shopping", "Rent", "Entertainment", "Laundry", "bills","Others")
             val builder = androidx.appcompat.app.AlertDialog.Builder(this)
             builder.setTitle("Select Category")
             builder.setItems(categories) { _, which ->
@@ -91,6 +91,7 @@ class AddExpenseActivity : AppCompatActivity() {
             "date" to date,
             "timestamp" to System.currentTimeMillis(),
             "userId" to FirebaseAuth.getInstance().currentUser?.uid
+           // "userId" to currentUser?.uid
         )
 
         db.collection("users")
