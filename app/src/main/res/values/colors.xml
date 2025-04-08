@@ -22,14 +22,14 @@
 <!--    <color name="colorBills">#26A69A</color>        &lt;!&ndash; Teal &ndash;&gt;-->
 <!--    <color name="colorOthers">#BDBDBD</color>-->
 
-    <color name="pie_color_food">#4CAF50</color>
-    <color name="pie_color_grocery">#2196F3</color>
-    <color name="pie_color_shopping">#FF9800</color>
-    <color name="pie_color_rent">#F44336</color>
-    <color name="pie_color_entertainment">#9C27B0</color>
-    <color name="pie_color_laundry">#00BCD4</color>
+    <color name="pie_color_food">#5CB338</color>
+    <color name="pie_color_grocery">#D76C82</color>
+    <color name="pie_color_shopping">#2DAA9E</color>
+    <color name="pie_color_rent">#F09319</color>
+    <color name="pie_color_entertainment">#B82132</color>
+    <color name="pie_color_laundry">#FFCF50</color>
     <color name="pie_color_bills">#795548</color>
-    <color name="pie_color_others">#607D8B</color>
+    <color name="pie_color_others">#F44336</color>
     <color name="black">#000000</color>
 
 </resources>

@@ -13,11 +13,11 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_marginTop="30dp"
             android:layout_width="200dp"
             android:layout_height="200dp"
+            android:layout_marginTop="30dp"
             android:contentDescription="Login Illustration"
-            android:src="@drawable/login_page_image" />
+            android:src="@drawable/accounting" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -52,7 +52,7 @@
             <EditText
                 android:id="@+id/editTextEmail"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:autofillHints=""
                 android:background="@drawable/edittext_background"
@@ -79,7 +79,7 @@
             <EditText
                 android:id="@+id/editTextPassword"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:background="@drawable/edittext_background"
                 android:hint="Password"
@@ -89,15 +89,15 @@
                 android:textColorHint="#888888" />
         </LinearLayout>
 
-<!--        <TextView-->
-<!--            android:id="@+id/forgotPassword"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_gravity="end"-->
-<!--            android:layout_marginBottom="20dp"-->
-<!--            android:text="Forgot your password?"-->
-<!--            android:textColor="@color/primary"-->
-<!--            android:textSize="12sp" />-->
+        <!--        <TextView-->
+        <!--            android:id="@+id/forgotPassword"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_gravity="end"-->
+        <!--            android:layout_marginBottom="20dp"-->
+        <!--            android:text="Forgot your password?"-->
+        <!--            android:textColor="@color/primary"-->
+        <!--            android:textSize="12sp" />-->
 
         <Button
             android:id="@+id/buttonLogin"
@@ -126,12 +126,12 @@
 
                 android:id="@+id/textViewSignup"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" Sign Up"
+                android:layout_height="48dp"
                 android:clickable="true"
+                android:focusable="true"
+                android:text=" Sign Up"
                 android:textColor="#E14A7E"
-                android:textStyle="bold"
-                android:focusable="true" />
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
