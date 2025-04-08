@@ -162,9 +162,7 @@ class DashboardActivity : AppCompatActivity() {
 
         val uid = currentUser.uid
 
-        db.collection("users")
-            .document(uid)
-            .collection("expenses")
+        db.collection("expenses")
             .whereGreaterThanOrEqualTo("timestamp", startDate)
             .whereLessThanOrEqualTo("timestamp", now)
             .get()
