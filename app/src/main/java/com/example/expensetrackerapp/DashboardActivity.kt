@@ -35,6 +35,25 @@ class DashboardActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         val welcomeTextView = findViewById<TextView>(R.id.dashboardWelcomeText)
+        val db = FirebaseFirestore.getInstance()
+        val currentUser = auth.currentUser
+
+        if (currentUser != null) {
+            val uid = currentUser.uid
+            db.collection("users").document(uid).get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val name = document.getString("name") ?: "User"
+                        welcomeTextView.text = "Welcome, $name to your  Dashboard!"
+                    } else {
+                        welcomeTextView.text = "Welcome to Expense Tracker Dashboard!"
+                    }
+                }
+                .addOnFailureListener {
+                    welcomeTextView.text = "Welcome to Expense Tracker Dashboard!"
+                }
+        }
+
         val buttonAddExpense = findViewById<Button>(R.id.buttonAddExpense)
         val buttonViewExpenses = findViewById<Button>(R.id.buttonViewExpenses)
         val buttonUserProfile = findViewById<Button>(R.id.buttonUserProfile)
