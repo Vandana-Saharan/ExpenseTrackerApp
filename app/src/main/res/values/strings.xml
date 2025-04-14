@@ -15,4 +15,14 @@
         <item>Yearly</item>
     </string-array>
 
+<!--    <string-array name="category_options">-->
+<!--        <item>All</item>-->
+<!--        <item>Food</item>-->
+<!--        <item>Transport</item>-->
+<!--        <item>Shopping</item>-->
+<!--        <item>Entertainment</item>-->
+<!--        <item>Health</item>-->
+<!--        <item>Others</item>-->
+<!--    </string-array>-->
+
 </resources>
