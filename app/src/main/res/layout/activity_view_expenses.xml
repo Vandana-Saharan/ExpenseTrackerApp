@@ -16,6 +16,30 @@
         android:layout_marginBottom="16dp"
         android:layout_gravity="center_horizontal" />
 
+    <!-- 🔍 Filter Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="10dp">
+
+        <Button
+            android:id="@+id/btnShowFilterDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filter Expenses"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="12dp"/>
+
+<!--        <Button-->
+<!--            android:id="@+id/btnFilter"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Filter" />-->
+    </LinearLayout>
+
+    <!-- 💸 Expenses List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewExpenses"
         android:layout_width="match_parent"
