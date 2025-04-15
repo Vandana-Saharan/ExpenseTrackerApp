@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,7 +20,7 @@ class ViewExpensesActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var expenseAdapter: ExpenseAdapter
     private var expensesList = mutableListOf<Expense>()
-
+    private lateinit var textNoExpenses: TextView
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
@@ -39,6 +40,8 @@ class ViewExpensesActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.recyclerViewExpenses)
         btnShowFilterDialog = findViewById(R.id.btnShowFilterDialog)
+
+        textNoExpenses = findViewById(R.id.textNoExpenses)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -132,6 +135,9 @@ class ViewExpensesActivity : AppCompatActivity() {
                 expensesList.clear()
                 expensesList.addAll(filteredExpenses)
                 expenseAdapter.updateList(expensesList)
+
+
+                textNoExpenses.visibility = if (expensesList.isEmpty()) View.VISIBLE else View.GONE
             }
             .addOnFailureListener { e ->
                 Log.e("ExpenseFilter", "Failed to filter expenses: ${e.message}")
@@ -157,6 +163,8 @@ class ViewExpensesActivity : AppCompatActivity() {
                 expensesList.clear()
                 expensesList.addAll(expenses)
                 expenseAdapter.updateList(expensesList)
+
+                textNoExpenses.visibility = if (expensesList.isEmpty()) View.VISIBLE else View.GONE
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error fetching expenses: ${e.message}", Toast.LENGTH_SHORT).show()

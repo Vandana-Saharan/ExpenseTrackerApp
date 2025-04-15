@@ -22,17 +22,21 @@ import androidx.core.content.ContextCompat
 import java.util.Calendar
 import com.google.firebase.firestore.FirebaseFirestore
 import android.util.Log
+import android.widget.ImageView
 
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var filterSpinner: Spinner
     private lateinit var pieChart: PieChart
+    private lateinit var imageNoData: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
         auth = FirebaseAuth.getInstance()
+
+        imageNoData = findViewById(R.id.imageNoData)
 
         val welcomeTextView = findViewById<TextView>(R.id.dashboardWelcomeText)
         val db = FirebaseFirestore.getInstance()
@@ -68,6 +72,10 @@ class DashboardActivity : AppCompatActivity() {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             filterSpinner.adapter = adapter
         }
+
+        // Set default filter to "Weekly"
+        filterSpinner.setSelection(1) // 0: Daily, 1: Weekly, 2: Monthly, 3: Yearly
+        loadPieChartData("Weekly") // Load initial data
 
         filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -145,11 +153,9 @@ class DashboardActivity : AppCompatActivity() {
         val entries = ArrayList<PieEntry>()
         val categoryMap = mutableMapOf<String, Float>()
 
-        // Defined categories
         val categories = listOf("Food", "Grocery", "Shopping", "Rent", "Entertainment", "Laundry", "Bills", "Others")
         categories.forEach { categoryMap[it] = 0f }
 
-        // Set time filter
         val calendar = Calendar.getInstance()
         val now = calendar.time
         when (filter) {
@@ -170,7 +176,6 @@ class DashboardActivity : AppCompatActivity() {
 
         val uid = currentUser.uid
 
-        // Correct path: users/{uid}/expenses
         db.collection("users").document(uid).collection("expenses")
             .whereGreaterThanOrEqualTo("timestamp", startDate.time)
             .whereLessThanOrEqualTo("timestamp", now.time)
@@ -180,16 +185,22 @@ class DashboardActivity : AppCompatActivity() {
                     val category = document.getString("category") ?: "Others"
                     val amountStr = document.get("amount").toString()
                     val amount = amountStr.toFloatOrNull() ?: 0f
-
                     categoryMap[category] = categoryMap[category]?.plus(amount) ?: amount
                 }
 
-                // Add only non-zero values
                 val validEntries = categoryMap.filterValues { it > 0f }.map { (category, amount) ->
                     PieEntry(amount, category)
                 }
 
-                updatePieChart(validEntries, categoryMap)
+                if (validEntries.isEmpty()) {
+                    pieChart.visibility = View.GONE
+                    imageNoData.visibility = View.VISIBLE
+                    findViewById<TextView>(R.id.tvTotalExpense).text = "No expenses to display"
+                } else {
+                    pieChart.visibility = View.VISIBLE
+                    imageNoData.visibility = View.GONE
+                    updatePieChart(validEntries, categoryMap)
+                }
             }
             .addOnFailureListener { e ->
                 Log.e("PieChartError", "Error loading chart data", e)

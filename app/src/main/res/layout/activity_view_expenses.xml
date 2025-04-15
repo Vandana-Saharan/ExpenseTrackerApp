@@ -47,6 +47,16 @@
 <!--            android:layout_height="wrap_content"-->
 <!--            android:text="Filter" />-->
     </LinearLayout>
+    <TextView
+        android:id="@+id/textNoExpenses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No expenses found for the selected filters."
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:padding="12dp"
+        android:visibility="gone" />
 
     <!-- 💸 Expenses List -->
     <androidx.recyclerview.widget.RecyclerView
