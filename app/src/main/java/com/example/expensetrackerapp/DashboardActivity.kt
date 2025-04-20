@@ -27,11 +27,12 @@ import android.content.Context
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
+import com.example.expensetrackerapp.PieChartMarkerView
 
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var filterSpinner: Spinner
+    private lateinit var buttonFilter: Button
     private lateinit var pieChart: PieChart
     private lateinit var imageNoData: ImageView
 
@@ -68,30 +69,22 @@ class DashboardActivity : AppCompatActivity() {
         val buttonViewExpenses = findViewById<Button>(R.id.buttonViewExpenses)
         val buttonUserProfile = findViewById<Button>(R.id.buttonUserProfile)
 
-        // Initialize Spinner
-        filterSpinner = findViewById(R.id.filterSpinner)
-        ArrayAdapter.createFromResource(
-            this,
-            R.array.filter_options,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            filterSpinner.adapter = adapter
-        }
-
-        // Set default filter to "Weekly"
-        filterSpinner.setSelection(1) // 0: Daily, 1: Weekly, 2: Monthly, 3: Yearly
-        loadPieChartData("Weekly") // Load initial data
-
-        filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>, view: View?, position: Int, id: Long
-            ) {
-                val filter = parent.getItemAtPosition(position).toString()
-                loadPieChartData(filter)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
+        val buttonFilter = findViewById<Button>(R.id.buttonFilter)
+        // Filter dialog
+        val filters = resources.getStringArray(R.array.filter_options)
+        var selectedFilterIndex = 1 // default Weekly
+        buttonFilter.text = filters[selectedFilterIndex]
+        buttonFilter.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Filter Expenses")
+                .setSingleChoiceItems(filters, selectedFilterIndex) { dialog, which ->
+                    selectedFilterIndex = which
+                    val filter = filters[which]
+                    buttonFilter.text = filter
+                    loadPieChartData(filter)
+                    dialog.dismiss()
+                }
+                .show()
         }
 
         // PieChart setup
@@ -118,7 +111,7 @@ class DashboardActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Refresh chart data and budget alerts when returning from other activities
-        val filter = filterSpinner.selectedItem?.toString() ?: "Weekly"
+        val filter = findViewById<Button>(R.id.buttonFilter).text.toString()
         loadPieChartData(filter)
         auth.currentUser?.uid?.let { checkBudgetAlert(it) }
     }
@@ -126,9 +119,9 @@ class DashboardActivity : AppCompatActivity() {
     private fun setupPieChart() {
         pieChart.description.isEnabled = false
         pieChart.setUsePercentValues(true)
-        pieChart.setDrawEntryLabels(true)
-        pieChart.setEntryLabelTextSize(12f)
-        pieChart.setEntryLabelColor(Color.BLACK)
+        pieChart.setDrawEntryLabels(false) // Hide labels on slices
+        pieChart.setEntryLabelTextSize(0f)
+        pieChart.setEntryLabelColor(Color.TRANSPARENT)
         pieChart.centerText = "Expense by Category"
         pieChart.setCenterTextSize(18f)
         pieChart.animateY(1000)
@@ -139,6 +132,9 @@ class DashboardActivity : AppCompatActivity() {
         legend.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
         legend.orientation = Legend.LegendOrientation.HORIZONTAL
         legend.setDrawInside(false)
+
+        // Display marker view on slice selection
+        pieChart.marker = PieChartMarkerView(this, R.layout.marker_view)
     }
 
     private fun checkLoginAndProceed(action: () -> Unit) {
@@ -237,9 +233,7 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         val data = PieData(dataSet).apply {
-            setDrawValues(true)
-            setValueTextSize(12f)
-            setValueTextColor(Color.BLACK)
+            setDrawValues(false) // Hide value text on slices
         }
 
         pieChart.data = data
