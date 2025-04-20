@@ -9,64 +9,83 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:background="@drawable/bg_translucent_blur"
+        android:padding="16dp"
+        android:layout_margin="0dp">
 
+        <!-- Profile and Name Section -->
         <ImageView
             android:id="@+id/imageViewProfile"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginTop="30dp"
-            android:src="@drawable/profile_icon"
-            android:contentDescription="Profile Picture" />
+            android:background="@drawable/bg_border"
+            android:padding="4dp"
+            android:clipToOutline="true"
+            android:outlineProvider="background"
+            android:scaleType="centerCrop"
+            android:contentDescription="Profile Picture"
+            android:src="@drawable/profile_icon" />
 
-        <!-- New Editable Name Field -->
-        <EditText
-            android:id="@+id/editTextName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Your Name"
-            android:textSize="20sp"
-            android:textColor="@color/primary_dark"
-            android:enabled="false"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/primary" />
-
-        <!-- Edit and Save Buttons -->
+        <!-- Name Edit Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="end"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="16dp">
+
+            <EditText
+                android:id="@+id/editTextName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:hint="Your Name"
+                android:textSize="18sp"
+                android:textColor="@color/primary_dark"
+                android:enabled="false"
+                android:backgroundTint="@color/primary" />
 
             <Button
                 android:id="@+id/buttonEditName"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="0.2"
                 android:text="Edit"
+                android:textSize="14sp"
                 android:backgroundTint="@color/primary"
-                android:textColor="#ffffff"
-                android:layout_marginEnd="8dp"/>
+                android:textColor="#FFFFFF"/>
 
             <Button
                 android:id="@+id/buttonSaveName"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="0.2"
                 android:text="Save"
+                android:textSize="14sp"
                 android:backgroundTint="@color/primary_dark"
-                android:textColor="#ffffff"
+                android:textColor="#FFFFFF"
                 android:visibility="gone"/>
         </LinearLayout>
 
-        <!-- Original views -->
+        <!-- Email -->
         <TextView
             android:id="@+id/textViewEmail"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Email"
-            android:textSize="18sp"
-            android:layout_marginTop="8dp"
-            android:textColor="@color/primary"/>
+            android:textSize="16sp"
+            android:textColor="@color/primary"
+            android:layout_marginTop="8dp" />
+        <!-- Account Created -->
+        <TextView
+            android:id="@+id/textViewAccountCreated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Account Created: --"
+            android:textSize="16sp"
+            android:textColor="@color/primary_dark"
+            android:layout_marginTop="4dp" />
 
         <TextView
             android:id="@+id/textViewTotalExpense"
@@ -76,15 +95,6 @@
             android:textSize="18sp"
             android:layout_marginTop="12dp"
             android:textColor="@color/primary_dark"/>
-
-        <TextView
-            android:id="@+id/textViewAccountCreated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Account Created: --"
-            android:textSize="16sp"
-            android:layout_marginTop="8dp"
-            android:textColor="@color/primary"/>
 
         <!-- Budget Management Section -->
         <View
@@ -102,23 +112,26 @@
             android:textStyle="bold"
             android:textColor="@color/primary_dark"
             android:gravity="center"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="8dp" />
             
         <!-- Budget Input -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp">
-            
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_border"
+            android:padding="8dp"
+            android:layout_marginVertical="4dp">
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.4"
                 android:text="Monthly Budget:"
-                android:textSize="16sp"
-                android:textColor="@color/primary" />
-                
+                android:textColor="@color/primary"
+                android:textSize="16sp" />
+
             <EditText
                 android:id="@+id/editTextBudgetAmount"
                 android:layout_width="0dp"
@@ -127,14 +140,15 @@
                 android:hint="Amount"
                 android:inputType="numberDecimal"
                 android:backgroundTint="@color/primary" />
-                
+
             <Button
                 android:id="@+id/buttonSaveBudget"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.2"
+                android:layout_weight="0.25"
                 android:text="Save"
                 android:textSize="12sp"
+                android:maxLines="1"
                 android:backgroundTint="@color/primary" />
         </LinearLayout>
         
@@ -143,7 +157,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_border"
+            android:padding="8dp"
+            android:layout_marginVertical="4dp">
             
             <TextView
                 android:layout_width="0dp"
@@ -166,9 +183,10 @@
                 android:id="@+id/buttonSaveLimit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.2"
+                android:layout_weight="0.25"
                 android:text="Save"
                 android:textSize="12sp"
+                android:maxLines="1"
                 android:backgroundTint="@color/primary" />
         </LinearLayout>
         
@@ -181,16 +199,17 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:layout_marginTop="16dp"
-            android:textColor="@color/primary_dark" />
+            android:layout_marginTop="12dp"
+            android:padding="12dp"
+            android:textColor="@color/primary" />
 
         <Button
             android:id="@+id/buttonLogout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Logout"
+            android:layout_marginTop="8dp"
             android:backgroundTint="@color/primary_dark"
-            android:textColor="#ffffff"
-            android:layout_marginTop="20dp"/>
+            android:text="Logout"
+            android:textColor="#ffffff" />
     </LinearLayout>
 </ScrollView>

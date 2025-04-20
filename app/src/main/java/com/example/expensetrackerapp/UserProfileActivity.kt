@@ -15,6 +15,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.util.Log
 import android.content.Context
+import android.net.Uri
+import android.provider.MediaStore
+import android.Manifest
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import java.io.File
+import androidx.appcompat.app.AlertDialog
 
 class UserProfileActivity : AppCompatActivity() {
 
@@ -39,6 +48,15 @@ class UserProfileActivity : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private val currentMonth = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(Date())
+
+    private var currentUserId: String? = null
+
+    companion object {
+        private const val PICK_IMAGE_REQUEST = 1001
+        private const val CAPTURE_IMAGE_REQUEST = 1002
+        private const val STORAGE_PERMISSION_CODE = 2001
+        private const val CAMERA_PERMISSION_CODE = 2002
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -73,9 +91,11 @@ class UserProfileActivity : AppCompatActivity() {
             return
         }
 
-        user.photoUrl?.let {
-            Glide.with(this).load(it).into(imageViewProfile)
-        }
+        currentUserId = user.uid
+        // load persisted or default profile icon
+        loadProfileIcon(user.uid)
+        imageViewProfile.isClickable = true
+        imageViewProfile.setOnClickListener { showImageOptionDialog() }
 
         editTextName.setText(user.displayName ?: "Name not available")
         editTextName.isEnabled = false
@@ -112,14 +132,14 @@ class UserProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // 👇 Edit button click
+        // Edit button click
         buttonEditName.setOnClickListener {
             editTextName.isEnabled = true
             buttonSaveName.visibility = View.VISIBLE
             buttonEditName.visibility = View.GONE
         }
 
-        // 👇 Save button click
+        // Save button click
         buttonSaveName.setOnClickListener {
             val newName = editTextName.text.toString().trim()
             if (newName.isEmpty()) {
@@ -359,6 +379,102 @@ class UserProfileActivity : AppCompatActivity() {
             } else {
                 textViewRemainingAmount.setTextColor(getColor(android.R.color.black))
             }
+        }
+    }
+
+    private fun showImageOptionDialog() {
+        val options = arrayOf("Choose from Gallery", "Take Photo")
+        AlertDialog.Builder(this)
+            .setTitle("Set Profile Photo")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> pickFromGalleryWithPermission()
+                    1 -> captureFromCameraWithPermission()
+                }
+            }
+            .show()
+    }
+
+    private fun pickFromGalleryWithPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
+        } else {
+            openGallery()
+        }
+    }
+
+    private fun captureFromCameraWithPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE)
+        } else {
+            openCamera()
+        }
+    }
+
+    private fun openGallery() {
+        Intent(Intent.ACTION_PICK).apply {
+            type = "image/*"
+            startActivityForResult(this, PICK_IMAGE_REQUEST)
+        }
+    }
+
+    private fun openCamera() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+            startActivityForResult(this, CAPTURE_IMAGE_REQUEST)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            when (requestCode) {
+                STORAGE_PERMISSION_CODE -> openGallery()
+                CAMERA_PERMISSION_CODE -> openCamera()
+            }
+        } else {
+            Toast.makeText(this, "Permission required to set profile photo", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
+            data?.data?.let { uri ->
+                // display selected image
+                Glide.with(this).load(uri).into(imageViewProfile)
+                // save uri in SharedPreferences
+                currentUserId?.let { uid ->
+                    val prefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
+                    prefs.edit().putString("${uid}_profile_uri", uri.toString()).apply()
+                }
+            }
+        } else if (requestCode == CAPTURE_IMAGE_REQUEST && resultCode == RESULT_OK) {
+            val bitmap = data?.extras?.get("data") as? Bitmap
+            bitmap?.let { bmp ->
+                imageViewProfile.setImageBitmap(bmp)
+                // save bitmap to internal file and URI
+                currentUserId?.let { uid ->
+                    val file = File(filesDir, "${uid}_profile.jpg")
+                    file.outputStream().use { out -> bmp.compress(Bitmap.CompressFormat.JPEG, 90, out) }
+                    val uri = Uri.fromFile(file)
+                    val prefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
+                    prefs.edit().putString("${uid}_profile_uri", uri.toString()).apply()
+                }
+            }
+        }
+    }
+
+    private fun loadProfileIcon(userId: String) {
+        val prefs = getSharedPreferences("ProfilePrefs", Context.MODE_PRIVATE)
+        val uriString = prefs.getString("${userId}_profile_uri", null)
+        if (uriString != null) {
+            Glide.with(this).load(Uri.parse(uriString)).into(imageViewProfile)
+        } else {
+            imageViewProfile.setImageResource(R.drawable.profile_icon)
         }
     }
 

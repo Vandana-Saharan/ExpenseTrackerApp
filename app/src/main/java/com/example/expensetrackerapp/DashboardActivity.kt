@@ -277,9 +277,9 @@ class DashboardActivity : AppCompatActivity() {
                     }
                     
                     Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG)
-                        .setBackgroundTint(ContextCompat.getColor(this@DashboardActivity, android.R.color.holo_red_light))
+                        .setBackgroundTint(ContextCompat.getColor(this@DashboardActivity, android.R.color.holo_red_dark))
                         .setTextColor(Color.WHITE)
-                        .setActionTextColor(ContextCompat.getColor(this@DashboardActivity, android.R.color.holo_blue_dark))
+                        .setActionTextColor(ContextCompat.getColor(this@DashboardActivity, android.R.color.holo_blue_light))
                         .setAction("View Budget") { _: View ->
                             startActivity(Intent(this@DashboardActivity, UserProfileActivity::class.java))
                         }
