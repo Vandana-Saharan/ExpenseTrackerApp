@@ -23,6 +23,10 @@ import java.util.Calendar
 import com.google.firebase.firestore.FirebaseFirestore
 import android.util.Log
 import android.widget.ImageView
+import android.content.Context
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -52,6 +56,8 @@ class DashboardActivity : AppCompatActivity() {
                     } else {
                         welcomeTextView.text = "Welcome to Expense Tracker Dashboard!"
                     }
+                    // Check budget alert after loading user data
+                    checkBudgetAlert(uid)
                 }
                 .addOnFailureListener {
                     welcomeTextView.text = "Welcome to Expense Tracker Dashboard!"
@@ -107,6 +113,14 @@ class DashboardActivity : AppCompatActivity() {
         buttonUserProfile.setOnClickListener {
             startActivity(Intent(this, UserProfileActivity::class.java))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh chart data and budget alerts when returning from other activities
+        val filter = filterSpinner.selectedItem?.toString() ?: "Weekly"
+        loadPieChartData(filter)
+        auth.currentUser?.uid?.let { checkBudgetAlert(it) }
     }
 
     private fun setupPieChart() {
@@ -233,5 +247,88 @@ class DashboardActivity : AppCompatActivity() {
 
         val totalExpense = categoryMap.values.sum()
         findViewById<TextView>(R.id.tvTotalExpense).text = "Total: ₹%.2f".format(totalExpense)
+    }
+    
+    private fun checkBudgetAlert(userId: String) {
+        // Use coroutines to perform the Firestore operations
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                // Get budget and limit from SharedPreferences
+                val sharedPrefs = getSharedPreferences("BudgetPrefs", Context.MODE_PRIVATE)
+                val currentMonth = java.text.SimpleDateFormat("yyyy-MM", java.util.Locale.getDefault()).format(java.util.Date())
+                val budget = sharedPrefs.getFloat("${currentMonth}_budget", -1f)
+                val limit = sharedPrefs.getFloat("monthly_limit", -1f)
+                
+                // If budget or limit not set, return early
+                if (budget < 0 || limit < 0) {
+                    return@launch
+                }
+                
+                // Calculate monthly expenses
+                val monthlyExpense = fetchMonthlyExpenses(userId)
+                val remaining = budget - monthlyExpense.toFloat()
+                
+                // Show alert if remaining amount is less than or equal to limit
+                if (remaining <= limit) {
+                    val message = if (remaining <= 0) {
+                        "❗ You've exceeded your budget!"
+                    } else {
+                        "⚠️ Alert: Only ₹${String.format("%.2f", remaining)} remaining from your budget!"
+                    }
+                    
+                    Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG)
+                        .setBackgroundTint(ContextCompat.getColor(this@DashboardActivity, android.R.color.holo_red_light))
+                        .setTextColor(Color.WHITE)
+                        .setActionTextColor(ContextCompat.getColor(this@DashboardActivity, android.R.color.holo_blue_dark))
+                        .setAction("View Budget") { _: View ->
+                            startActivity(Intent(this@DashboardActivity, UserProfileActivity::class.java))
+                        }
+                        .show()
+                }
+            } catch (e: Exception) {
+                Log.e("BudgetAlert", "Error checking budget alert: ${e.message}")
+            }
+        }
+    }
+    
+    private suspend fun fetchMonthlyExpenses(userId: String): Double {
+        return try {
+            val calendar = Calendar.getInstance()
+            
+            // Set start of month
+            calendar.set(Calendar.DAY_OF_MONTH, 1)
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            val startOfMonth = calendar.time.time
+
+            // Set end of month
+            calendar.add(Calendar.MONTH, 1)
+            calendar.add(Calendar.MILLISECOND, -1)
+            val endOfMonth = calendar.time.time
+
+            val db = FirebaseFirestore.getInstance()
+            val snapshot = withContext(Dispatchers.IO) {
+                db.collection("users")
+                    .document(userId)
+                    .collection("expenses")
+                    .whereGreaterThanOrEqualTo("timestamp", startOfMonth)
+                    .whereLessThanOrEqualTo("timestamp", endOfMonth)
+                    .get()
+                    .await()
+            }
+
+            val monthlyExpense = snapshot.documents.mapNotNull {
+                it.getString("amount")?.toDoubleOrNull()
+            }.sum()
+            
+            Log.d("BudgetAlert", "Monthly expenses: $monthlyExpense")
+            monthlyExpense
+            
+        } catch (e: Exception) {
+            Log.e("BudgetAlert", "Error fetching monthly expenses: ${e.message}")
+            0.0
+        }
     }
 }

@@ -101,7 +101,7 @@ class UserProfileActivity : AppCompatActivity() {
         }
         
         buttonSaveLimit.setOnClickListener {
-            saveLimit()
+            saveLimit(user.uid)
         }
         
         buttonLogout.setOnClickListener {
@@ -159,7 +159,7 @@ class UserProfileActivity : AppCompatActivity() {
                 .await()
 
             withContext(Dispatchers.Main) {
-                Toast.makeText(this@UserProfileActivity, "Fetched: ${snapshot.size()} expenses", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this@UserProfileActivity, "Fetched: ${snapshot.size()} expenses", Toast.LENGTH_SHORT).show()
             }
 
             snapshot.documents.forEach {
@@ -272,8 +272,15 @@ class UserProfileActivity : AppCompatActivity() {
             return
         }
         
-        // Save to SharedPreferences
+        // Ensure budget >= alert limit
         val sharedPrefs = getSharedPreferences("BudgetPrefs", Context.MODE_PRIVATE)
+        val currentLimit = sharedPrefs.getFloat("monthly_limit", -1f)
+        if (currentLimit >= 0f && budget < currentLimit) {
+            Toast.makeText(this, "Budget cannot be less than your alert limit (₹${String.format("%.2f", currentLimit)})", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Save to SharedPreferences
         sharedPrefs.edit().putFloat("${currentMonth}_budget", budget).apply()
         
         Toast.makeText(this, "Budget saved successfully!", Toast.LENGTH_SHORT).show()
@@ -282,7 +289,7 @@ class UserProfileActivity : AppCompatActivity() {
         updateRemainingBudget(userId)
     }
     
-    private fun saveLimit() {
+    private fun saveLimit(userId: String) {
         val limitText = editTextLimitAmount.text.toString()
         if (limitText.isEmpty()) {
             Toast.makeText(this, "Please enter a limit amount", Toast.LENGTH_SHORT).show()
@@ -313,6 +320,9 @@ class UserProfileActivity : AppCompatActivity() {
         sharedPrefs.edit().putFloat("monthly_limit", limit).apply()
         
         Toast.makeText(this, "Alert limit saved successfully!", Toast.LENGTH_SHORT).show()
+
+        // Update the remaining budget display
+        updateRemainingBudget(userId)
     }
     
     private fun updateRemainingBudget(userId: String) {
@@ -338,14 +348,14 @@ class UserProfileActivity : AppCompatActivity() {
             if (limit >= 0 && remaining <= limit) {
                 textViewRemainingAmount.setTextColor(getColor(android.R.color.holo_red_dark))
                 
-                // Show warning if remaining amount is below limit
-                if (remaining <= limit) {
-                    Toast.makeText(
-                        this@UserProfileActivity,
-                        "Warning: Remaining amount is below your set limit!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+//                // Show warning if remaining amount is below limit
+//                if (remaining <= limit) {
+//                    Toast.makeText(
+//                        this@UserProfileActivity,
+//                        "Warning: Remaining amount is below your set limit!",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
             } else {
                 textViewRemainingAmount.setTextColor(getColor(android.R.color.black))
             }
