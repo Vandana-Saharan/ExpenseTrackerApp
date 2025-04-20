@@ -86,6 +86,104 @@
             android:layout_marginTop="8dp"
             android:textColor="@color/primary"/>
 
+        <!-- Budget Management Section -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/primary"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" />
+            
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Budget Management"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_dark"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+            
+        <!-- Budget Input -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:text="Monthly Budget:"
+                android:textSize="16sp"
+                android:textColor="@color/primary" />
+                
+            <EditText
+                android:id="@+id/editTextBudgetAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:hint="Amount"
+                android:inputType="numberDecimal"
+                android:backgroundTint="@color/primary" />
+                
+            <Button
+                android:id="@+id/buttonSaveBudget"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:text="Save"
+                android:textSize="12sp"
+                android:backgroundTint="@color/primary" />
+        </LinearLayout>
+        
+        <!-- Limit Input -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:text="Alert Limit:"
+                android:textSize="16sp"
+                android:textColor="@color/primary" />
+                
+            <EditText
+                android:id="@+id/editTextLimitAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:hint="Amount"
+                android:inputType="numberDecimal"
+                android:backgroundTint="@color/primary" />
+                
+            <Button
+                android:id="@+id/buttonSaveLimit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:text="Save"
+                android:textSize="12sp"
+                android:backgroundTint="@color/primary" />
+        </LinearLayout>
+        
+        <!-- Remaining Budget Display -->
+        <TextView
+            android:id="@+id/textViewRemainingAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Remaining Budget: ₹0"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/primary_dark" />
+
         <Button
             android:id="@+id/buttonLogout"
             android:layout_width="match_parent"

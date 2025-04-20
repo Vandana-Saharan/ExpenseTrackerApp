@@ -14,6 +14,7 @@ import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
 import android.util.Log
+import android.content.Context
 
 class UserProfileActivity : AppCompatActivity() {
 
@@ -24,12 +25,20 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var textViewAccountCreated: TextView
     private lateinit var buttonLogout: Button
 
-    // 👇 New UI elements
+    // User profile UI elements
     private lateinit var editTextName: EditText
     private lateinit var buttonEditName: Button
     private lateinit var buttonSaveName: Button
+    
+    // Budget management UI elements
+    private lateinit var editTextBudgetAmount: EditText
+    private lateinit var editTextLimitAmount: EditText
+    private lateinit var textViewRemainingAmount: TextView
+    private lateinit var buttonSaveBudget: Button
+    private lateinit var buttonSaveLimit: Button
 
     private val db = FirebaseFirestore.getInstance()
+    private val currentMonth = SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(Date())
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -46,6 +55,13 @@ class UserProfileActivity : AppCompatActivity() {
         buttonLogout = findViewById(R.id.buttonLogout)
         buttonEditName = findViewById(R.id.buttonEditName)
         buttonSaveName = findViewById(R.id.buttonSaveName)
+        
+        // Initialize budget management UI elements
+        editTextBudgetAmount = findViewById(R.id.editTextBudgetAmount)
+        editTextLimitAmount = findViewById(R.id.editTextLimitAmount)
+        textViewRemainingAmount = findViewById(R.id.textViewRemainingAmount)
+        buttonSaveBudget = findViewById(R.id.buttonSaveBudget)
+        buttonSaveLimit = findViewById(R.id.buttonSaveLimit)
 
         val user = auth.currentUser
         ensureUserDocumentExists()
@@ -74,8 +90,20 @@ class UserProfileActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
             val totalExpense = fetchTotalExpensesForUser(user.uid)
             textViewTotalExpense.text = "Total Spent: ₹$totalExpense"
+            
+            // Load budget data and update UI
+            loadBudgetData(user.uid)
         }
 
+        // Setup budget management buttons
+        buttonSaveBudget.setOnClickListener {
+            saveBudget(user.uid)
+        }
+        
+        buttonSaveLimit.setOnClickListener {
+            saveLimit()
+        }
+        
         buttonLogout.setOnClickListener {
             auth.signOut()
             Toast.makeText(this, "Logged out successfully!", Toast.LENGTH_SHORT).show()
@@ -122,37 +150,6 @@ class UserProfileActivity : AppCompatActivity() {
         }
     }
 
-//    private suspend fun fetchTotalExpensesForUser(userId: String): Double {
-//        return try {
-//            val snapshot = db.collection("expenses")
-//                .whereEqualTo("userId", userId)
-//                .get()
-//                .await()
-//
-//            // Optional debug toast (only if you're in Main thread)
-//            withContext(Dispatchers.Main) {
-//                Toast.makeText(this@UserProfileActivity, "Fetched: ${snapshot.size()} expenses", Toast.LENGTH_SHORT).show()
-//            }
-//
-//            // Log each expense for debugging
-//            snapshot.documents.forEach {
-//                val rawAmount = it.get("amount")
-//                val userInDoc = it.get("userId")
-//                Log.d("MyLog", "DocID: ${it.id} | Amount: $rawAmount | userId: $userInDoc")
-//            }
-//
-//            // Sum up all valid amounts
-//            val totalExpense =  snapshot.documents.mapNotNull {
-//                it.getDouble("amount") ?: it.getString("amount")?.toDoubleOrNull()
-//            }.sum()
-//            Log.i("MyLog", totalExpense.toString());
-//            return totalExpense;
-//
-//        } catch (e: Exception) {
-//            Log.e("DEBUG", "Failed to fetch total expenses: ${e.message}")
-//            0.0
-//        }
-//    }
     private suspend fun fetchTotalExpensesForUser(userId: String): Double {
         return try {
             val snapshot = db.collection("users")
@@ -182,6 +179,45 @@ class UserProfileActivity : AppCompatActivity() {
             0.0
         }
     }
+    
+    private suspend fun fetchMonthlyExpenses(userId: String): Double {
+        return try {
+            val calendar = Calendar.getInstance()
+            
+            // Set start of month
+            calendar.set(Calendar.DAY_OF_MONTH, 1)
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            val startOfMonth = calendar.time.time
+
+            // Set end of month
+            calendar.add(Calendar.MONTH, 1)
+            calendar.add(Calendar.MILLISECOND, -1)
+            val endOfMonth = calendar.time.time
+
+            val snapshot = db.collection("users")
+                .document(userId)
+                .collection("expenses")
+                .whereGreaterThanOrEqualTo("timestamp", startOfMonth)
+                .whereLessThanOrEqualTo("timestamp", endOfMonth)
+                .get()
+                .await()
+
+            val monthlyExpense = snapshot.documents.mapNotNull {
+                it.getString("amount")?.toDoubleOrNull()
+            }.sum()
+            
+            Log.d("BudgetManagement", "Monthly expenses: $monthlyExpense")
+            monthlyExpense
+            
+        } catch (e: Exception) {
+            Log.e("BudgetManagement", "Error fetching monthly expenses: ${e.message}")
+            0.0
+        }
+    }
+    
     private fun ensureUserDocumentExists() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val uid = user.uid
@@ -201,6 +237,117 @@ class UserProfileActivity : AppCompatActivity() {
                     .addOnFailureListener {
                         Toast.makeText(this, "Failed to create profile!", Toast.LENGTH_SHORT).show()
                     }
+            }
+        }
+    }
+    
+    private fun loadBudgetData(userId: String) {
+        // Load saved budget and limit from SharedPreferences
+        val sharedPrefs = getSharedPreferences("BudgetPrefs", Context.MODE_PRIVATE)
+        val savedBudget = sharedPrefs.getFloat("${currentMonth}_budget", -1f)
+        val savedLimit = sharedPrefs.getFloat("monthly_limit", -1f)
+        
+        if (savedBudget >= 0) {
+            editTextBudgetAmount.setText(savedBudget.toString())
+        }
+        
+        if (savedLimit >= 0) {
+            editTextLimitAmount.setText(savedLimit.toString())
+        }
+        
+        // Update remaining budget
+        updateRemainingBudget(userId)
+    }
+    
+    private fun saveBudget(userId: String) {
+        val budgetText = editTextBudgetAmount.text.toString()
+        if (budgetText.isEmpty()) {
+            Toast.makeText(this, "Please enter a budget amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        val budget = budgetText.toFloatOrNull()
+        if (budget == null || budget <= 0) {
+            Toast.makeText(this, "Please enter a valid budget amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Save to SharedPreferences
+        val sharedPrefs = getSharedPreferences("BudgetPrefs", Context.MODE_PRIVATE)
+        sharedPrefs.edit().putFloat("${currentMonth}_budget", budget).apply()
+        
+        Toast.makeText(this, "Budget saved successfully!", Toast.LENGTH_SHORT).show()
+        
+        // Update the remaining budget display
+        updateRemainingBudget(userId)
+    }
+    
+    private fun saveLimit() {
+        val limitText = editTextLimitAmount.text.toString()
+        if (limitText.isEmpty()) {
+            Toast.makeText(this, "Please enter a limit amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        val limit = limitText.toFloatOrNull()
+        if (limit == null || limit <= 0) {
+            Toast.makeText(this, "Please enter a valid limit amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Check if budget is set and limit is not greater than budget
+        val sharedPrefs = getSharedPreferences("BudgetPrefs", Context.MODE_PRIVATE)
+        val currentBudget = sharedPrefs.getFloat("${currentMonth}_budget", -1f)
+        
+        if (currentBudget < 0) {
+            Toast.makeText(this, "Please set a budget first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        if (limit > currentBudget) {
+            Toast.makeText(this, "Alert limit cannot be greater than budget", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Save to SharedPreferences
+        sharedPrefs.edit().putFloat("monthly_limit", limit).apply()
+        
+        Toast.makeText(this, "Alert limit saved successfully!", Toast.LENGTH_SHORT).show()
+    }
+    
+    private fun updateRemainingBudget(userId: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // Get the monthly budget from SharedPreferences
+            val sharedPrefs = getSharedPreferences("BudgetPrefs", Context.MODE_PRIVATE)
+            val budget = sharedPrefs.getFloat("${currentMonth}_budget", -1f)
+            val limit = sharedPrefs.getFloat("monthly_limit", -1f)
+            
+            if (budget < 0) {
+                textViewRemainingAmount.text = "Set a budget to see remaining amount"
+                return@launch
+            }
+            
+            // Get the monthly expenses
+            val monthlyExpense = fetchMonthlyExpenses(userId)
+            val remaining = budget - monthlyExpense.toFloat()
+            
+            // Update the UI
+            textViewRemainingAmount.text = "Remaining Budget: ₹${String.format("%.2f", remaining)}"
+            
+            // Change text color based on remaining amount and limit
+            if (limit >= 0 && remaining <= limit) {
+                textViewRemainingAmount.setTextColor(getColor(android.R.color.holo_red_dark))
+                
+                // Show warning if remaining amount is below limit
+                if (remaining <= limit) {
+                    Toast.makeText(
+                        this@UserProfileActivity,
+                        "Warning: Remaining amount is below your set limit!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } else {
+                textViewRemainingAmount.setTextColor(getColor(android.R.color.black))
             }
         }
     }
